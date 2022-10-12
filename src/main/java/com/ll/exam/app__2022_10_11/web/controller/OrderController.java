@@ -3,6 +3,7 @@ package com.ll.exam.app__2022_10_11.web.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.exam.app__2022_10_11.app.security.dto.MemberContext;
+import com.ll.exam.app__2022_10_11.app.util.Ut;
 import com.ll.exam.app__2022_10_11.domain.member.Member;
 import com.ll.exam.app__2022_10_11.domain.order.Order;
 import com.ll.exam.app__2022_10_11.domain.order.exception.ActorCanNotSeeOrderException;
@@ -97,10 +98,9 @@ public class OrderController {
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            JsonNode successNode = responseEntity.getBody();
-            model.addAttribute("orderId", successNode.get("orderId").asText());
-            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
-            return "order/success";
+            orderService.payByTossPayments(order);
+
+            return "redirect:/order/%d?msg=%s".formatted(order.getId(), Ut.url.encode("결제가 완료되었습니다."));
         } else {
             JsonNode failNode = responseEntity.getBody();
             model.addAttribute("message", failNode.get("message").asText());
