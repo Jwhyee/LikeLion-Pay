@@ -64,7 +64,7 @@ public class OrderController {
         });
     }
 
-    private final String SECRET_KEY = "test_sk_jkYG57Eba3GgM1wB0a53pWDOxmA1";
+    private final String SECRET_KEY = "test_sk_4vZnjEJeQVx17vAMLZMrPmOoBN0k";
 
     @RequestMapping("/{id}/success")
     public String confirmPayment(
