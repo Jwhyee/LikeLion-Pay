@@ -1,6 +1,6 @@
 package com.ll.exam.app__2022_10_11.app.security.dto;
 
-import com.ll.exam.app__2022_10_11.app.member.entity.Member;
+import com.ll.exam.app__2022_10_11.domain.member.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;

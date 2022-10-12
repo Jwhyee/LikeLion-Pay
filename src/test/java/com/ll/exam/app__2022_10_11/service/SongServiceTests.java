@@ -1,17 +1,14 @@
 package com.ll.exam.app__2022_10_11.service;
 
-import com.ll.exam.app__2022_10_11.app.member.entity.Member;
-import com.ll.exam.app__2022_10_11.app.member.repository.MemberRepository;
-import com.ll.exam.app__2022_10_11.app.song.entity.Song;
-import com.ll.exam.app__2022_10_11.app.song.service.SongService;
+import com.ll.exam.app__2022_10_11.domain.member.Member;
+import com.ll.exam.app__2022_10_11.domain.member.MemberRepository;
+import com.ll.exam.app__2022_10_11.domain.song.Song;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

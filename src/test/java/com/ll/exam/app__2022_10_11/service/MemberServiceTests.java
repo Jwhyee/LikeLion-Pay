@@ -1,8 +1,7 @@
 package com.ll.exam.app__2022_10_11.service;
 
 
-import com.ll.exam.app__2022_10_11.app.member.entity.Member;
-import com.ll.exam.app__2022_10_11.app.member.service.MemberService;
+import com.ll.exam.app__2022_10_11.domain.member.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

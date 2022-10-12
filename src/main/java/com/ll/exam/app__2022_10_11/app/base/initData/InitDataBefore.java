@@ -1,13 +1,13 @@
 package com.ll.exam.app__2022_10_11.app.base.initData;
 
-import com.ll.exam.app__2022_10_11.app.cart.entity.CartItem;
-import com.ll.exam.app__2022_10_11.app.cart.service.CartService;
-import com.ll.exam.app__2022_10_11.app.member.entity.Member;
-import com.ll.exam.app__2022_10_11.app.member.service.MemberService;
-import com.ll.exam.app__2022_10_11.app.song.entity.Song;
-import com.ll.exam.app__2022_10_11.app.song.service.SongService;
-import com.ll.exam.app__2022_10_11.product.entity.Product;
-import com.ll.exam.app__2022_10_11.product.service.ProductService;
+import com.ll.exam.app__2022_10_11.domain.cart.CartItem;
+import com.ll.exam.app__2022_10_11.service.CartService;
+import com.ll.exam.app__2022_10_11.domain.member.Member;
+import com.ll.exam.app__2022_10_11.service.MemberService;
+import com.ll.exam.app__2022_10_11.domain.song.Song;
+import com.ll.exam.app__2022_10_11.service.SongService;
+import com.ll.exam.app__2022_10_11.domain.product.Product;
+import com.ll.exam.app__2022_10_11.service.ProductService;
 
 public interface InitDataBefore {
     default void before(MemberService memberService, SongService songService, ProductService productService, CartService cartService) {
