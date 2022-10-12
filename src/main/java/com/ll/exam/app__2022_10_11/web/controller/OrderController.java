@@ -8,6 +8,7 @@ import com.ll.exam.app__2022_10_11.domain.member.Member;
 import com.ll.exam.app__2022_10_11.domain.order.Order;
 import com.ll.exam.app__2022_10_11.domain.order.exception.ActorCanNotSeeOrderException;
 import com.ll.exam.app__2022_10_11.domain.order.exception.OrderIdNotMatchedException;
+import com.ll.exam.app__2022_10_11.service.MemberService;
 import com.ll.exam.app__2022_10_11.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -33,6 +34,8 @@ import java.util.Map;
 @RequestMapping("/order")
 public class OrderController {
     private final OrderService orderService;
+
+    private final MemberService memberService;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper;
 
@@ -43,11 +46,14 @@ public class OrderController {
 
         Member actor = memberContext.getMember();
 
-        if (orderService.actorCanSee(actor, order) == false) {
+        long restCash = memberService.getRestCash(actor);
+
+        if (!orderService.actorCanSee(actor, order)) {
             throw new ActorCanNotSeeOrderException();
         }
 
         model.addAttribute("order", order);
+        model.addAttribute("actorRestCash", restCash);
 
         return "order/detail";
     }
