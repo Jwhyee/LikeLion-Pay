@@ -9,6 +9,7 @@ import com.ll.exam.app__2022_10_11.domain.order.Order;
 import com.ll.exam.app__2022_10_11.domain.order.exception.ActorCanNotPayOrderException;
 import com.ll.exam.app__2022_10_11.domain.order.exception.ActorCanNotSeeOrderException;
 import com.ll.exam.app__2022_10_11.domain.order.exception.OrderIdNotMatchedException;
+import com.ll.exam.app__2022_10_11.domain.order.exception.OrderNotEnoughRestCashException;
 import com.ll.exam.app__2022_10_11.service.MemberService;
 import com.ll.exam.app__2022_10_11.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -95,13 +96,14 @@ public class OrderController {
             @PathVariable long id,
             @RequestParam String paymentKey,
             @RequestParam String orderId,
-            @RequestParam Long amount, Model model) throws Exception {
+            @RequestParam Long amount, Model model,
+            @AuthenticationPrincipal MemberContext memberContext) throws Exception {
 
         Order order = orderService.findForPrintById(id).get();
 
         long orderIdInputed = Long.parseLong(orderId.split("__")[1]);
 
-        if ( id != orderIdInputed ) {
+        if (id != orderIdInputed) {
             throw new OrderIdNotMatchedException();
         }
 
@@ -112,7 +114,15 @@ public class OrderController {
 
         Map<String, String> payloadMap = new HashMap<>();
         payloadMap.put("orderId", orderId);
-        payloadMap.put("amount", String.valueOf(order.calculatePayPrice()));
+        payloadMap.put("amount", String.valueOf(amount));
+
+        Member actor = memberContext.getMember();
+        long restCash = memberService.getRestCash(actor);
+        long payPriceRestCash = order.calculatePayPrice() - amount;
+
+        if (payPriceRestCash > restCash) {
+            throw new OrderNotEnoughRestCashException();
+        }
 
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(payloadMap), headers);
 
@@ -120,7 +130,7 @@ public class OrderController {
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            orderService.payByTossPayments(order);
+            orderService.payByTossPayments(order, payPriceRestCash);
 
             return "redirect:/order/%d?msg=%s".formatted(order.getId(), Ut.url.encode("결제가 완료되었습니다."));
         } else {
