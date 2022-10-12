@@ -1,4 +1,4 @@
-package com.ll.exam.app__2022_10_11.web.controller;
+package com.ll.exam.app__2022_10_11.web.controller.home;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
