@@ -21,6 +21,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .authorizeRequests(
+                        authorizeRequests -> authorizeRequests
+                                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                )
                 .formLogin(
                         formLogin -> formLogin
                                 .loginPage("/member/login") // GET
