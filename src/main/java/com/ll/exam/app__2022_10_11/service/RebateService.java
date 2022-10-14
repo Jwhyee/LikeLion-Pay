@@ -1,22 +1,29 @@
 package com.ll.exam.app__2022_10_11.service;
 
+import com.ll.exam.app__2022_10_11.app.base.dto.RsData;
 import com.ll.exam.app__2022_10_11.app.util.Ut;
+import com.ll.exam.app__2022_10_11.domain.cash.CashLog;
 import com.ll.exam.app__2022_10_11.domain.order.OrderItem;
 import com.ll.exam.app__2022_10_11.domain.order.RebateOrderItem;
 import com.ll.exam.app__2022_10_11.domain.order.RebateOrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RebateService {
     private final OrderService orderService;
+    private final MemberService memberService;
     private final RebateOrderItemRepository rebateOrderItemRepository;
 
+    @Transactional
     public void makeDate(String yearMonth) {
         int monthEndDay = Ut.date.getEndDayOf(yearMonth);
 
@@ -38,6 +45,7 @@ public class RebateService {
         rebateOrderItems.forEach(this::makeRebateOrderItem);
     }
 
+    @Transactional
     public void makeRebateOrderItem(RebateOrderItem item) {
         RebateOrderItem oldRebateOrderItem = rebateOrderItemRepository.findByOrderItemId(item.getOrderItem().getId()).orElse(null);
 
@@ -61,5 +69,29 @@ public class RebateService {
         LocalDateTime toDate = Ut.date.parse(toDateStr);
 
         return rebateOrderItemRepository.findAllByPayDateBetweenOrderByIdAsc(fromDate, toDate);
+    }
+
+    @Transactional
+    public RsData rebate(long orderItemId) {
+        RebateOrderItem rebateOrderItem = rebateOrderItemRepository.findByOrderItemId(orderItemId).get();
+
+        if (!rebateOrderItem.isRebateAvailable()) {
+            return RsData.of("F-1", "정산을 할 수 없는 상태입니다.");
+        }
+
+        int calculateRebatePrice = rebateOrderItem.calculateRebatePrice();
+
+        RsData<Map<String, Object>> addCashRsData = memberService.addCash(rebateOrderItem.getProduct().getAuthor(), calculateRebatePrice, "정산__%d__지급__예치금".formatted(rebateOrderItem.getOrderItem().getId()));
+        CashLog cashLog = (CashLog) addCashRsData.getData().get("cashLog");
+
+        rebateOrderItem.setRebateDone(cashLog.getId());
+
+        return RsData.of(
+                "S-1",
+                "정산성공",
+                Ut.mapOf(
+                        "cashLogId", cashLog.getId()
+                )
+        );
     }
 }

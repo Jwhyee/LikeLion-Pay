@@ -1,5 +1,7 @@
 package com.ll.exam.app__2022_10_11.service;
 
+import com.ll.exam.app__2022_10_11.app.base.dto.RsData;
+import com.ll.exam.app__2022_10_11.app.util.Ut;
 import com.ll.exam.app__2022_10_11.domain.cash.CashLog;
 import com.ll.exam.app__2022_10_11.domain.member.Member;
 import com.ll.exam.app__2022_10_11.domain.member.MemberRepository;
@@ -9,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -41,14 +44,21 @@ public class MemberService {
     }
 
     @Transactional
-    public long addCash(Member member, long price, String eventType) {
+    public RsData<Map<String, Object>> addCash(Member member, long price, String eventType) {
         CashLog cashLog = cashService.addCash(member, price, eventType);
 
         long newRestCash = member.getRestCash() + cashLog.getPrice();
         member.setRestCash(newRestCash);
         memberRepository.save(member);
 
-        return newRestCash;
+        return RsData.of(
+                "S-1",
+                "성공",
+                Ut.mapOf(
+                        "cashLog", cashLog,
+                        "newRestCash", newRestCash
+                )
+        );
     }
 
     public long getRestCash(Member member) {
