@@ -5,20 +5,23 @@ import com.ll.exam.app__2022_10_11.app.util.Ut;
 import com.ll.exam.app__2022_10_11.domain.order.RebateOrderItem;
 import com.ll.exam.app__2022_10_11.service.RebateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
 @RequestMapping("/adm/rebate")
 @RequiredArgsConstructor
+@Slf4j
 public class AdmRebateController {
-
     private final RebateService rebateService;
+
     @GetMapping("/makeData")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String showMakeData() {
@@ -28,8 +31,11 @@ public class AdmRebateController {
     @PostMapping("/makeData")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String makeData(String yearMonth) {
-        rebateService.makeDate(yearMonth);
-        return "redirect:/adm/rebate/rebateOrderItemList?yearMonth=" + yearMonth + "&msg=" + Ut.url.encode("정산데이터가 성공적으로 생성되었습니다.");
+        RsData makeDateRsData = rebateService.makeDate(yearMonth);
+
+        String redirect = makeDateRsData.addMsgToUrl("redirect:/adm/rebate/rebateOrderItemList?yearMonth=" + yearMonth);
+
+        return redirect;
     }
 
     @GetMapping("/rebateOrderItemList")
@@ -48,10 +54,17 @@ public class AdmRebateController {
 
     @PostMapping("/rebateOne/{orderItemId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    @ResponseBody
-    public String rebateOne(@PathVariable long orderItemId) {
+    public String rebateOne(@PathVariable long orderItemId, HttpServletRequest req) {
         RsData rebateRsData = rebateService.rebate(orderItemId);
 
-        return rebateRsData.getMsg();
+        String referer = req.getHeader("Referer");
+        log.debug("referer : " + referer);
+        String yearMonth = Ut.url.getQueryParamValue(referer, "yearMonth", "");
+
+        String redirect = "redirect:/adm/rebate/rebateOrderItemList?yearMonth=" + yearMonth;
+
+        redirect = rebateRsData.addMsgToUrl(redirect);
+
+        return redirect;
     }
 }
