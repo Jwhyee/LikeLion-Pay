@@ -4,12 +4,14 @@ import com.ll.exam.app__2022_10_11.domain.cart.CartItem;
 import com.ll.exam.app__2022_10_11.domain.member.Member;
 import com.ll.exam.app__2022_10_11.domain.order.Order;
 import com.ll.exam.app__2022_10_11.domain.order.OrderItem;
+import com.ll.exam.app__2022_10_11.domain.order.OrderItemRepository;
 import com.ll.exam.app__2022_10_11.domain.order.OrderRepository;
 import com.ll.exam.app__2022_10_11.domain.product.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,8 @@ public class OrderService {
     private final MemberService memberService;
     private final CartService cartService;
     private final OrderRepository orderRepository;
+
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
     public Order createFromCart(Member buyer) {
@@ -123,5 +127,9 @@ public class OrderService {
 
     public boolean actorCanPayment(Member actor, Order order) {
         return actorCanSee(actor, order);
+    }
+
+    public List<OrderItem> findAllByPayDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+        return orderItemRepository.findAllByPayDateBetween(fromDate, toDate);
     }
 }
