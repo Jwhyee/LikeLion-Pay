@@ -28,7 +28,7 @@ public class AdmRebateController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseBody
     public String makeData(String yearMonth) {
-        rebateService.makeData(yearMonth);
+        rebateService.makeDate(yearMonth);
         return "성공";
     }
 }
